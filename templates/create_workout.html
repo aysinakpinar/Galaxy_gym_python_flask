@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="text-center mt-4">Create a New Workout</h1>
+
+<!-- Show flash messages specific to this page -->
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <div class="alert alert-dismissible fade show" role="alert">
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+{% endwith %}
+
+<!-- Workout Creation Form -->
+<div class="container">
+    <form method="POST" class="mt-4">
+        <div class="form-group">
+            <label for="workout_name" class="font-weight-bold">Workout Name:</label>
+            <input type="text" name="workout_name" class="form-control" required placeholder="e.g. Legs">
+        </div>
+
+        <div class="form-group">
+            <label for="estimated_time" class="font-weight-bold">Estimated Time:</label>
+            <input type="text" name="estimated_time" class="form-control" required placeholder="e.g. 10">
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block mt-3">Create Workout</button>
+    </form>
+</div>
+
+<h3 class="mt-5">Your Workouts</h3>
+{% if user_workouts %}
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Workout</th>
+                <th>Estimated Time</th>
+                <th>Exercises</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for workout in user_workouts %}
+            <tr>
+                <td>{{ workout.name }}</td>
+                <td>{{ workout.estimated_time }}</td>
+
+                <!-- Display exercises under each workout as a table -->
+                <td>
+                    {% if workout.workout_exercises %}
+                    <table class="table table-bordered table-sm">
+                        <thead>
+                            <tr>
+                                <th>Exercise</th>
+                                <th>Description</th>
+                                <th>Intensity</th>
+                                <th>Sets</th>
+                                <th>Reps</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in workout.workout_exercises %}
+                            <tr>
+                                <td>
+                                    {% if entry.exercise and entry.exercise.picture_path %}
+                                        <img src="{{ url_for('static', filename=entry.exercise.picture_path.split('/static/')[-1]) }}" 
+                                            alt="{{ entry.exercise.name }}" class="img-thumbnail" 
+                                            style="max-width: 80px; max-height: 80px;">
+                                    {% else %}
+                                        <p>No image available</p>
+                                    {% endif %}
+                                    <br>
+                                    <strong>{{ entry.exercise.name if entry.exercise else 'Unknown Exercise' }}</strong>
+                                </td>
+                                <td>{{ entry.exercise.description if entry.exercise else 'N/A' }}</td>
+                                <td>{{ entry.exercise.intensity if entry.exercise.intensity else 'N/A' }}</td>
+                                <td>{{ entry.exercise.sets if entry.exercise.sets else 'N/A' }}</td>
+                                <td>{{ entry.exercise.reps if entry.exercise.reps else 'N/A' }}</td>
+                                <td>
+                                    {% if entry.done %}
+                                        <span class="badge bg-success">✅ Done</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">❌ Not Done</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                        <p>No exercises added yet.</p>
+                    {% endif %}
+                </td>
+
+                <td>
+                    <!-- Grouping the buttons with a margin between them -->
+                    <div class="btn-group" role="group" aria-label="Workout Actions">
+                        <!-- Remove Workout with margin-right -->
+                        <form action="{{ url_for('workout.remove_workout', workout_id=workout.id) }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-danger btn-sm mr-2">Remove</button>
+                        </form>
+
+                        <!-- Edit Workout -->
+                        <form action="{{ url_for('workout.manage_workout', workout_id=workout.id) }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-info btn-sm">Edit</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+    <p>No workouts yet.</p>
+{% endif %}
+{% endblock %}
