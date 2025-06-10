@@ -77,8 +77,6 @@ createdb galaxy_db
 createdb galaxy_db_test
 ```
 
-Edit `lib/database_connection.py` to reflect the database names.
-
 ### 2. Run Migrations
 
 ```bash
@@ -198,10 +196,7 @@ pytest -sv
 python app.py
 ```
 
-Then open: [http://127.0.0.1:5000/index](http://127.0.0.1:5000/index)
+Then open: [http://127.0.0.1:5000/home](http://127.0.0.1:5000/home)
 
 ---
 
-## 📜 License
-
-MIT License (or specify another if applicable)
